@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 
@@ -15,11 +15,23 @@ export default function App() {
     ['1', '2', '3', '+'],
     [' ', '0', '.', '=']
   ]
-   
+  
+  useEffect(() =>{
+
+  }, [historico, valor])
 
   return (
     <View style={styles.container}>
       <View>
+        <View style={{alignItems: 'flex-end', marginBottom: 16}}>
+          {historico.map((linhaHistorico: string) => {
+            return(
+              <Text variant='bodyLarge'>
+                {linhaHistorico}
+              </Text>
+            )
+          })}
+        </View>
         <View style= {{alignItems:'flex-end', marginBottom: 16}}>
           <Text variant='titleLarge'>
             {valor}
@@ -36,7 +48,10 @@ export default function App() {
                       if (coluna === 'AC') {
                         return (
                           <View style={styles.coluna}>
-                            <Button mode="elevated" onPress={() => setValor('0')}>
+                            <Button mode="elevated" onPress={() => {
+                              setValor('0')
+                              setHistorico([])
+                            }}>
                               {coluna}
                             </Button>
                           </View>
@@ -54,7 +69,15 @@ export default function App() {
                       if (coluna === '=') {
                         return (
                           <View style={styles.coluna}>
-                            <Button mode="contained" onPress={() => setValor(`${eval(valor)}`)}>
+                            <Button mode="contained" onPress={() => {
+                              setValor(`${eval(valor)}`)
+                              
+                              const historicoTemp: string[] = historico //recupera o valor do historico
+                              historicoTemp.push(valor.concat('=', eval(valor))) // adiciona uma equação no começo do historico/lista
+                              if(historicoTemp.length > 5) historicoTemp.shift() //se o historico for > 5 tira o ultimo elemento da lista
+                              setHistorico(historicoTemp) // define o novo valor do historico
+                              console.log(historico)
+                            }}>
                               {coluna}
                             </Button>
                           </View>
@@ -65,7 +88,6 @@ export default function App() {
                           <Button mode="text" onPress={() => {
                             if(coluna === ' ') return
                             console.log(valor)
-
 
                             if(coluna === '+' && valor.charAt(valor.length-1) === '') return
                             if(coluna === '/' && valor.charAt(valor.length-1) === '') return
@@ -104,20 +126,15 @@ export default function App() {
                             if(coluna === '-' && valor.charAt(valor.length-1) === '.') return
                             if(coluna === '+' && valor.charAt(valor.length-1) === '.') return
 
-                            const historicoTemp: string[] = historico //recupera o valor do historico
-                            historicoTemp.unshift(valor.concat('=', eval(valor))) // adiciona uma equação no começo do historico/lista
-                            if(historicoTemp.length > 5) historicoTemp.pop() //se o historico for > 5 tira o ultimo elemento da lista
-                            setHistorico(historicoTemp) // define o novo valor do historico
-
                             // if ternário
                             setValor(valor === '0' && // condição
-                                     coluna !== '+' &&
-                                     coluna !== '-' &&
-                                     coluna !== '*' &&
-                                     coluna !== '/' &&
-                                     coluna !== '.'
-                                      ? coluna // verdadeiro
-                                      : valor.concat(coluna)) // falso
+                              coluna !== '+' &&
+                              coluna !== '-' &&
+                              coluna !== '*' &&
+                              coluna !== '/' &&
+                              coluna !== '.'
+                                ? coluna // verdadeiro
+                                : valor.concat(coluna)) // falso
                           }}>
                             {coluna}
                           </Button>
