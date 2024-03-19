@@ -7,6 +7,7 @@ import { Button, Text } from 'react-native-paper';
 
 export default function App() {
   const [valor, setValor] = useState('0')
+  const [historico, setHistorico] = useState<string[]>([]) 
   const teclado = [
     ['AC', 'DEL', ' ', '/'],
     ['7', '8', '9', '*'],
@@ -14,6 +15,7 @@ export default function App() {
     ['1', '2', '3', '+'],
     [' ', '0', '.', '=']
   ]
+   
 
   return (
     <View style={styles.container}>
@@ -101,6 +103,11 @@ export default function App() {
                             if(coluna === '*' && valor.charAt(valor.length-1) === '.') return
                             if(coluna === '-' && valor.charAt(valor.length-1) === '.') return
                             if(coluna === '+' && valor.charAt(valor.length-1) === '.') return
+
+                            const historicoTemp: string[] = historico //recupera o valor do historico
+                            historicoTemp.unshift(valor.concat('=', eval(valor))) // adiciona uma equação no começo do historico/lista
+                            if(historicoTemp.length > 5) historicoTemp.pop() //se o historico for > 5 tira o ultimo elemento da lista
+                            setHistorico(historicoTemp) // define o novo valor do historico
 
                             // if ternário
                             setValor(valor === '0' && // condição
